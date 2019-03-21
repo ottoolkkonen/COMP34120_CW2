@@ -97,16 +97,26 @@ final class PseudoLeader
 	public void proceedNewDay(int p_date)
 		throws RemoteException
 	{
-		/*
-		 * Check for new price
-		 * Record l_newRecord = m_platformStub.query(m_type, p_date);
-		 *
-		 * Your own math model to compute the price here
-		 * ...
-		 * float l_newPrice = ....
-		 *
-		 * Submit your new price, and end your phase
-		 * m_platformStub.publishPrice(m_type, l_newPrice);
-		 */
+		
+		// Check for new price
+		Record l_newRecord = m_platformStub.query(m_type, p_date);
+		
+		float a = 0.5; // weight
+		float b = 0.5; // bias
+		float cL = l_newRecord.m_cost;
+
+		// Your own math model to compute the price here
+		
+		float l_newPrice = genPrice(a, b, cL);
+		
+		// Submit your new price, and end your phase
+		m_platformStub.publishPrice(m_type, l_newPrice);
+		 
+	}
+
+	private float genPrice(final float a, final float b, final float cL)
+	{
+		// Reaction function is in the form of b*uL + a
+		return (float) ((1-0.3*b)*cL+2+0.3*a)/(2-0.6*b);
 	}
 }
